@@ -1,39 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Green Network - Protect Earth</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>搜索</title>
     <style>
+        /* 消除body自动边框 */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+       :root {
+    --bg-color: #f0f0f0;
+    --input-bg: #fff;
+    --text-color: #333;
+    --border-color: #ccc;
+    --primary-color: #076cd9;
+    --btn-hover-color: #0056b3;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --input-bg: #2d2d2d;
+        --text-color: #e0e0e0;
+        --border-color: #404040;
+        --primary-color: #4dabf7;
+        --btn-hover-color: #339af0;
+    }
+}
+
+/* 搜索居中 */
+     .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: var(--bg-color);
+}
+
+
+/* 搜索框样式 */
+        .search-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
         }
 
-        :root {
-            --primary: #2e7d32;
-            --secondary: #4caf50;
-            --accent: #8bc34a;
-            --light: #e8f5e9;
-            --dark: #1b5e20;
-            --text: #333333;
-            --white: #ffffff;
+       .search-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 25px;
+    font-size: 16px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+      .search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+
+      .search-btn {
+    padding: 10px 25px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.search-btn:hover {
+    background-color: var(--btn-hover-color);
+}
+
+
+/* 搜索引擎下拉框样式 */
+        .search-engine-select {
+    padding: 12px 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    cursor: pointer;
+    margin-right: 5px;
+    outline: none;
+}
+
+.search-engine-select:focus {
+    border-color: var(--primary-color);
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form class="search-box" id="searchForm" action="https://cn.bing.com/search" method="GET">
+            <select class="search-engine-select" id="searchEngineSelect">
+                <option value="bing">B</option>
+                <option value="google">G</option>
+            </select>
+            <input type="text" class="search-input" id="searchInput" name="q" placeholder="输入搜索内容..." autocomplete="off">
+            <button type="submit" class="search-btn">搜索</button>
+        </form>
+    </div>
+
+    <script>
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchEngineSelect = document.getElementById('searchEngineSelect');
+
+        const engines = {
+            google: {
+                action: 'https://www.google.com/search',
+                name: 'q'
+            },
+            bing: {
+                action: 'https://cn.bing.com/search',
+                name: 'q'
+            }
+        };
+
+        let currentEngine = 'google';
+
+        searchEngineSelect.addEventListener('change', () => {
+            const engine = searchEngineSelect.value;
+            currentEngine = engine;
+
+            searchForm.action = engines[engine].action;
+            searchInput.name = engines[engine].name;
+        });
+
+        searchForm.addEventListener('submit', (e) => {
+            if (!searchInput.value.trim()) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+   //添加搜索引擎持久化
+        const searchEngine = localStorage.getItem('searchEngine');
+        if (searchEngine) {
+            currentEngine = searchEngine;
+            searchEngineSelect.value = searchEngine;
+            searchForm.action = engines[searchEngine].action;
+            searchInput.name = engines[searchEngine].name;
         }
 
-        body {
-            background-color: var(--light);
-            color: var(--text);
-            line-height: 1.6;
-        }
+        searchForm.addEventListener('submit', () => {
+            localStorage.setItem('searchEngine', currentEngine);
+        });
+ 
+        
 
-        header {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: var(--white);
-            padding: 1rem 0;
-            position: sticky;
+        // 监听系统主题变化
+const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+function updateTheme() {
+    if (prefersDarkScheme.matches) {
+        document.documentElement.style.setProperty('--bg-color', '#1a1a1a');
+        document.documentElement.style.setProperty('--input-bg', '#2d2d2d');
+        document.documentElement.style.setProperty('--text-color', '#e0e0e0');
+        document.documentElement.style.setProperty('--border-color', '#404040');
+        document.documentElement.style.setProperty('--primary-color', '#4dabf7');
+        document.documentElement.style.setProperty('--btn-hover-color', '#339af0');
+    } else {
+        document.documentElement.style.setProperty('--bg-color', '#f0f0f0');
+        document.documentElement.style.setProperty('--input-bg', '#fff');
+        document.documentElement.style.setProperty('--text-color', '#333');
+        document.documentElement.style.setProperty('--border-color', '#ccc');
+        document.documentElement.style.setProperty('--primary-color', '#007bff');
+        document.documentElement.style.setProperty('--btn-hover-color', '#0056b3');
+    }
+}
+
+// 初始化主题
+updateTheme();
+
+// 监听主题变化
+prefersDarkScheme.addEventListener('change', updateTheme);
+
+    </script>
+</body>
+</html>
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
